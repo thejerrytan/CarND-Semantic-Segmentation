@@ -58,19 +58,19 @@ def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
     # TODO: Implement function
     weights_stddev = 0.01
     weights_l2 = 1e-3
-    conv_1x1_of_7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='same', kernel_initializer = tf.random_normal_initializer(stddev=weights_stddev) , kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='conv_1x1_of_7')
+    conv_1x1_7 = tf.layers.conv2d(vgg_layer7_out, num_classes, 1, padding='same', kernel_initializer = tf.random_normal_initializer(stddev=weights_stddev) , kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='conv_1x1_of_7')
     
-    first_upsamplex2 = tf.layers.conv2d_transpose(conv_1x1_of_7, num_classes, 4, strides=(2,2), padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='first_upsamplex2')
+    first_upsamplex2 = tf.layers.conv2d_transpose(conv_1x1_7, num_classes, 4, strides=(2,2), padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='first_upsamplex2')
     
-    conv_1x1_of_4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='conv_1x1_of_4')
+    conv_1x1_4 = tf.layers.conv2d(vgg_layer4_out, num_classes, 1, padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='conv_1x1_of_4')
     
-    first_skip = tf.add(first_upsamplex2, conv_1x1_of_4, name='first_skip')
+    first_skip = tf.add(first_upsamplex2, conv_1x1_4, name='first_skip')
     
     second_upsamplex2 = tf.layers.conv2d_transpose(first_skip, num_classes, 4, strides=(2,2), padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='second_upsamplex2')
     
-    conv_1x1_of_3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='conv_1x1_of_3')
+    conv_1x1_3 = tf.layers.conv2d(vgg_layer3_out, num_classes, 1, padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='conv_1x1_of_3')
     
-    second_skip = tf.add(second_upsamplex2, conv_1x1_of_3, name='second_skip')
+    second_skip = tf.add(second_upsamplex2, conv_1x1_3, name='second_skip')
     
     third_upsamplex8 = tf.layers.conv2d_transpose(second_skip, num_classes, 16, strides=(8,8), padding='same', kernel_initializer=tf.random_normal_initializer(stddev=weights_stddev), kernel_regularizer=tf.contrib.layers.l2_regularizer(weights_l2), name='third_upsamplex8')
     
@@ -114,7 +114,6 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     """
     # TODO: Implement function
     sess.run(tf.global_variables_initializer())
-#     saver = tf.train.Saver()
     print("Starting training for {} epochs".format(epochs))
     print()
     for epoch in range(epochs):
@@ -129,8 +128,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             })
             loss_log.append('{:3f}'.format(loss))
             print(loss_log)
-#         saver.save(sess, 'my-model', global_step=epoch)
-        print("Training finished")
+    print("Training finished")
 tests.test_train_nn(train_nn)
 
 
@@ -169,7 +167,6 @@ def run():
         # TODO: Train NN using the train_nn function
         epochs = 48
         batch_size = 5
-        # saver = tf.train.Saver()
         train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_image, correct_label, keep_prob, learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
